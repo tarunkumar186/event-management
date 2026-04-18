@@ -1,25 +1,71 @@
-const router = require("express").Router();
-const validate = require("../middleware/validation");
-const eventCont = require("../controllers/eventCont");
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-router.route("/events").get(eventCont.eventIndex);
+const EventSchema = Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    event_poster: {
+      type: String,
+      required: true,
+    },
+    event_pic: {
+      type: String,
+      required: true,
+    },
+    sheetID: {
+      type: Number,
+      default: 0,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    tagline: {
+      type: String,
+      required: true,
+    },
+    category: {
+      type: String,
+      required: true,
+    },
+    featured: {
+      type: Boolean,
+      default: false,
+    },
+    registration_starts: {
+      type: Date,
+      required: true,
+    },
+    registration_ends: {
+      type: Date,
+      required: true,
+    },
+    event_starts: {
+      type: Date,
+      required: true,
+    },
+    event_ends: {
+      type: Date,
+      required: true,
+    },
+    result_declaration: {
+      type: Date,
+      default: 0000 - 00 - 00,
+    },
+    organizers: [Object],
+    hosts: [Object],
+    sponsors: [Object],
+    participants: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Participant",
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
-router.route("/events/live/all").get(eventCont.liveEventsRetriver);
-
-router.route("/events/ongoing/all").get(eventCont.ongoingEventsRetriver);
-
-router.route("/events/upcoming/all").get(eventCont.upcomingEventsRetriver);
-
-router.route("/events/archived/all").get(eventCont.archivedEventsRetriver);
-
-router
-  .route("/events-suggestion")
-  .post(validate.eventSuggestion, eventCont.eventSuggest);
-
-router
-  .route("/events/:name")
-  .get(eventCont.finder)
-  .post(validate.participantRegister, eventCont.registerParticipant);
-
-// Exporting routes
-module.exports = router;
+module.exports = mongoose.model("Event", EventSchema);
